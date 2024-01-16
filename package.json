@@ -6,11 +6,23 @@
     "node": ">=16.17.0",
     "npm": ">=8.15.0"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts", 
+  "scripts": {
+    "build": "tsc"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Hijazi313/nestjs-abstract-mongo-repository"
   },
-  "keywords": ["nestjs", "mongodb", "entity-repository", "mongoose", "abstract-repository", "nest.js"],
+  "keywords": [
+    "nestjs",
+    "mongodb",
+    "entity-repository",
+    "mongoose",
+    "abstract-repository",
+    "nest.js"
+  ],
   "author": "Muhammad Hamza Asif",
   "license": "ISC",
   "homepage": "https://github.com/Hijazi313/nestjs-abstract-mongo-repository",
@@ -21,5 +33,8 @@
   "peerDependencies": {
     "@nestjs/common": "^10.0.0",
     "mongoose": "^8.0.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
   }
 }

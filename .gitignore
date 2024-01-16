@@ -5,7 +5,7 @@ node_modules/
 *.tgz
 
 # Output of the 'npm publish' command
-dist/
+# dist/
 
 # TypeScript build artifacts
 *.js
