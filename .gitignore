@@ -10,7 +10,7 @@ node_modules/
 # TypeScript build artifacts
 *.js
 *.js.map
-*.d.ts
+# *.d.ts
 
 # Editor directories and files
 .vscode/
