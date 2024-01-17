@@ -1,11 +1,11 @@
-import { HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from "@nestjs/common";
 import {
   ClientSession,
   Document,
   FilterQuery,
   Model,
   UpdateQuery,
-} from 'mongoose';
+} from "mongoose";
 
 /**
  * Abstract class for creating MongoDB repositories with common CRUD operations.
@@ -38,10 +38,42 @@ export abstract class EntityRepository<T extends Document> {
       logger?: boolean;
     }> = {
       logger: false,
-    },
+    }
   ) {
     if (!options.entityModel) {
-      throw new Error('entityModel is required');
+      throw new Error("entityModel is required");
+    }
+  }
+
+  /**
+   * Creates a new document.
+   * @param createEntity - Data for creating the new document.
+   * @returns Promise resolving to the created document.
+   * @throws HttpException with appropriate status code if creation fails.
+   */
+
+  async create(createEntity: unknown) {
+    try {
+      return await new this.options.entityModel(createEntity).save();
+    } catch (err) {
+      this.handleDatabaseError(err);
+    }
+  }
+
+  /**
+   * Creates multiple documents.
+   * @param createEntities - Array of data for creating the new documents.
+   * @returns Promise resolving to an array of the created documents.
+   * @throws HttpException with appropriate status code if creation fails for any document.
+   */
+  async createMany(createEntities: unknown[]): Promise<T[]> {
+    try {
+      const createdDocuments = await this.options.entityModel.create(
+        createEntities
+      );
+      return createdDocuments;
+    } catch (err) {
+      this.handleDatabaseError(err);
     }
   }
 
@@ -55,7 +87,7 @@ export abstract class EntityRepository<T extends Document> {
   async find(
     entityFilterQuery: FilterQuery<T>,
     projection?: Record<string, unknown>,
-    options?: { skip?: number; limit?: number },
+    options?: { skip?: number; limit?: number }
   ): Promise<T[]> {
     return this.options.entityModel
       .find(entityFilterQuery, projection)
@@ -73,7 +105,7 @@ export abstract class EntityRepository<T extends Document> {
    */
   async findById(
     id: string,
-    projection?: Record<string, unknown>,
+    projection?: Record<string, unknown>
   ): Promise<T | null> {
     try {
       const data = await this.options.entityModel
@@ -82,7 +114,7 @@ export abstract class EntityRepository<T extends Document> {
       if (!data) {
         throw new HttpException(
           `No data found with ID ${id}`,
-          HttpStatus.NOT_FOUND,
+          HttpStatus.NOT_FOUND
         );
       }
       return data;
@@ -99,7 +131,7 @@ export abstract class EntityRepository<T extends Document> {
    */
   async findOne(
     entityFilterQuery: FilterQuery<T>,
-    projection?: Record<string, unknown>,
+    projection?: Record<string, unknown>
   ): Promise<T | null> {
     return this.options.entityModel
       .findOne(entityFilterQuery, projection)
@@ -116,7 +148,7 @@ export abstract class EntityRepository<T extends Document> {
   async fullTextSearch(searchText: string, searchField: string): Promise<T[]> {
     try {
       const searchQuery = {
-        [searchField]: { $regex: searchText, $options: 'i' },
+        [searchField]: { $regex: searchText, $options: "i" },
       } as FilterQuery<T>;
       return this.options.entityModel.find(searchQuery).exec();
     } catch (error) {
@@ -147,7 +179,7 @@ export abstract class EntityRepository<T extends Document> {
    */
   async distinctValues(
     field: string,
-    entityFilterQuery?: FilterQuery<T>,
+    entityFilterQuery?: FilterQuery<T>
   ): Promise<any[]> {
     try {
       return await this.options.entityModel
@@ -159,31 +191,21 @@ export abstract class EntityRepository<T extends Document> {
   }
 
   /**
-   * Creates a new document.
-   * @param createEntity - Data for creating the new document.
-   * @returns Promise resolving to the created document.
-   * @throws HttpException with appropriate status code if creation fails.
+   * Updates single document based on the provided filter query.
+   * @param filterQuery - Filter criteria for updating documents.
+   * @param update - Data to update documents with.
+   * @returns Promise resolving to the number of updated documents.
+   * @throws HttpException with appropriate status code if update fails.
    */
-
-  async create(createEntity: unknown) {
+  async updateOne(
+    filterQuery: FilterQuery<T>,
+    update: UpdateQuery<unknown>
+  ): Promise<number> {
     try {
-      return await new this.options.entityModel(createEntity).save();
-    } catch (err) {
-      this.handleDatabaseError(err);
-    }
-  }
-
-  /**
-   * Creates multiple documents.
-   * @param createEntities - Array of data for creating the new documents.
-   * @returns Promise resolving to an array of the created documents.
-   * @throws HttpException with appropriate status code if creation fails for any document.
-   */
-  async createMany(createEntities: unknown[]): Promise<T[]> {
-    try {
-      const createdDocuments =
-        await this.options.entityModel.create(createEntities);
-      return createdDocuments;
+      const updateResult = await this.options.entityModel
+        .updateOne(filterQuery, update)
+        .exec();
+      return updateResult.modifiedCount || 0;
     } catch (err) {
       this.handleDatabaseError(err);
     }
@@ -198,7 +220,7 @@ export abstract class EntityRepository<T extends Document> {
    */
   async updateMany(
     filterQuery: FilterQuery<T>,
-    update: UpdateQuery<unknown>,
+    update: UpdateQuery<unknown>
   ): Promise<number> {
     try {
       const updateResult = await this.options.entityModel
@@ -219,13 +241,13 @@ export abstract class EntityRepository<T extends Document> {
    */
   async findOneAndUpdate(
     filterQuery: FilterQuery<T>,
-    updatedObject: UpdateQuery<unknown>,
+    updatedObject: UpdateQuery<unknown>
   ): Promise<T | null> {
     try {
       return await this.options.entityModel.findOneAndUpdate(
         filterQuery,
         updatedObject,
-        { new: true },
+        { new: true }
       );
     } catch (err) {
       this.handleDatabaseError(err);
@@ -251,20 +273,20 @@ export abstract class EntityRepository<T extends Document> {
       if (!existingDoc) {
         throw new HttpException(
           `No data found with ID ${id}`,
-          HttpStatus.NOT_FOUND,
+          HttpStatus.NOT_FOUND
         );
       }
 
       // Simulate optimistic concurrency control
       if (update.__v && existingDoc.__v !== update.__v) {
-        throw new HttpException('Concurrency conflict', HttpStatus.CONFLICT);
+        throw new HttpException("Concurrency conflict", HttpStatus.CONFLICT);
       }
 
       const updatedDoc = await this.options.entityModel
         .findByIdAndUpdate(
           id,
           { ...update, __v: existingDoc.__v + 1 },
-          { new: true },
+          { new: true }
         )
         .session(session);
 
@@ -278,6 +300,7 @@ export abstract class EntityRepository<T extends Document> {
       this.handleDatabaseError(error);
     }
   }
+
   /**
    * Deletes a single document based on the provided filter query.
    * @param filterQuery - Filter criteria for deleting the document.
@@ -286,8 +309,9 @@ export abstract class EntityRepository<T extends Document> {
    */
   async deleteOne(filterQuery: FilterQuery<T>): Promise<boolean> {
     try {
-      const deleteResult =
-        await this.options.entityModel.deleteOne(filterQuery);
+      const deleteResult = await this.options.entityModel.deleteOne(
+        filterQuery
+      );
       return deleteResult.deletedCount >= 1;
     } catch (err) {
       this.handleDatabaseError(err);
@@ -302,13 +326,16 @@ export abstract class EntityRepository<T extends Document> {
    */
   async deleteMany(filterQuery: FilterQuery<T>): Promise<boolean> {
     try {
-      const deleteResult =
-        await this.options.entityModel.deleteMany(filterQuery);
+      const deleteResult = await this.options.entityModel.deleteMany(
+        filterQuery
+      );
       return deleteResult.deletedCount >= 1;
     } catch (err) {
       this.handleDatabaseError(err);
     }
   }
+
+  // Transaction and Session Management
 
   /**
    * Starts a new database session and transaction.
@@ -359,6 +386,8 @@ export abstract class EntityRepository<T extends Document> {
     session.endSession();
   }
 
+  // Additional Operations
+
   /**
    * Executes an aggregation pipeline on the entity's collection.
    * @param aggregatePipeline - Array of stages to process documents.
@@ -389,10 +418,10 @@ export abstract class EntityRepository<T extends Document> {
   private handleDatabaseError(error: any): void {
     if (this.options.logger) {
       this.logger.error(
-        `Database Error: ${error?.name} -  ${error.message || error}`,
+        `Database Error: ${error?.name} -  ${error.message || error}`
       );
     }
-    let errorMessage = 'Database operation failed';
+    let errorMessage = "Database operation failed";
     let errorStatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     switch (error.code) {
       case 11000:
@@ -401,23 +430,23 @@ export abstract class EntityRepository<T extends Document> {
         break;
       case 11001:
         errorStatusCode = HttpStatus.BAD_REQUEST;
-        errorMessage = 'Duplicate key error';
+        errorMessage = "Duplicate key error";
         break;
       case 12000:
         errorStatusCode = HttpStatus.BAD_REQUEST;
-        errorMessage = 'Invalid index specification';
+        errorMessage = "Invalid index specification";
         break;
       case 12010:
         errorStatusCode = HttpStatus.BAD_REQUEST;
-        errorMessage = 'Cannot build index on a non-existing field';
+        errorMessage = "Cannot build index on a non-existing field";
         break;
       case 12102:
         errorStatusCode = HttpStatus.BAD_REQUEST;
-        errorMessage = 'Index key too long';
+        errorMessage = "Index key too long";
         break;
       case 12134:
         errorStatusCode = HttpStatus.BAD_REQUEST;
-        errorMessage = 'Index not found';
+        errorMessage = "Index not found";
         break;
     }
 
