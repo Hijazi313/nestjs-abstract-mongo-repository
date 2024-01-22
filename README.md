@@ -51,7 +51,7 @@ class UserRepository extends EntityRepository<UserDocument> {
 
 The `create` method is used to create a new document in the database using the provided data. It returns a promise that resolves to the created document, or throws an `HttpException` with an appropriate status code if the creation fails.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
 const entityRepo = new EntityRepository({ entityModel: MyModel });
@@ -64,7 +64,7 @@ console.log(createdDocument); // { _id: '...', name: 'John Doe', age: 25, ... }
 
 The `createMany` method is used to create multiple documents in the database using the `entityModel.create` method. It takes an array of data for creating the new documents as input and returns a promise that resolves to an array of the created documents. If the creation fails for any document, it throws an `HttpException` with an appropriate status code.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
 const entityRepo = new EntityRepository({ entityModel: MyModel });
@@ -90,11 +90,9 @@ console.log(users);
 
 The `findById` method is used to find a document in the database by its ID. It takes an ID parameter and an optional projection parameter to specify which fields to include or exclude from the result. If a document with the specified ID is found, it is returned. If no document is found, an `HttpException` with a `NOT_FOUND` status is thrown.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
-const repository =
-  new EntityRepository() < MyDocument > { entityModel: MyModel };
 const document = await repository.findById("12345");
 console.log(document);
 // Output: The document with ID "12345" or 404 HttpException if not found
@@ -104,11 +102,9 @@ console.log(document);
 
 The `findOne` method is used to find a single document in the database based on the provided filter query and projection.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
-const repository =
-  new EntityRepository() < MyDocument > { entityModel: MyModel };
 const filterQuery = { name: "John" };
 const projection = { name: 1, age: 1 };
 const document = await repository.findOne(filterQuery, projection);
@@ -120,7 +116,7 @@ console.log(document);
 
 The `fullTextSearch` method performs a case-insensitive full-text search on a specified field in the database. It uses a regular expression to match documents that contain the specified search text in the specified field.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
 const searchText = "example";
@@ -133,7 +129,7 @@ console.log(results);
 
 The `count` method is used to count the number of documents in a MongoDB collection based on the provided filter query.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
 const filterQuery = { status: "active" };
@@ -145,7 +141,7 @@ console.log(count); // Output: 10
 
 The `distinctValues` method is used to find distinct values for a specified field based on the provided filter query.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
 const repository =
@@ -161,7 +157,7 @@ console.log(distinctValues);
 
 The `updateOne` method is used to update a single document in the database based on the provided filter query and update data.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
 const filterQuery = { _id: "123" };
@@ -174,11 +170,9 @@ console.log(result); // Output: 1
 
 The `updateMany` method updates multiple documents in the database based on the provided filter query and the data to update the documents with.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
-const repository =
-  new EntityRepository() < MyDocument > { entityModel: MyModel };
 const filterQuery = { field: "value" };
 const update = { $set: { field: "new value" } };
 
@@ -190,11 +184,9 @@ console.log(updatedCount); // Output: the number of updated documents
 
 The `findOneAndUpdate` method is used to find a document in the database based on the provided filter query, update it with the specified data, and return the updated document. It is a part of the `EntityRepository` class.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
-const repository =
-  new EntityRepository() < MyDocument > { entityModel: MyModel };
 const filterQuery = { _id: "123" };
 const updatedObject = { name: "John" };
 const updatedDocument = await repository.findOneAndUpdate(
@@ -209,11 +201,9 @@ console.log(updatedDocument);
 
 The `updateById` method updates a document in the database based on its ID. It uses optimistic concurrency control to handle potential race conditions.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
-const repository =
-  new EntityRepository() < MyDocument > { entityModel: MyModel };
 const updatedDocument = await repository.updateById("12345", { name: "John" });
 console.log(updatedDocument);
 ```
@@ -222,11 +212,9 @@ console.log(updatedDocument);
 
 This method is responsible for deleting a single document from the database based on the provided filter query.
 
-## Example Usage
+#### Example Usage
 
 ```javascript
-const repository =
-  new EntityRepository() < MyDocument > { entityModel: MyModel };
 const filterQuery = { _id: "123" };
 const result = await repository.deleteOne(filterQuery);
 console.log(result); // true or false
@@ -239,8 +227,6 @@ The `deleteMany` method is used to delete multiple documents from the database b
 ## Example Usage
 
 ```javascript
-const repository =
-  new EntityRepository() < MyDocument > { entityModel: MyModel };
 const filterQuery = { age: { $gte: 18 } };
 const result = await repository.deleteMany(filterQuery);
 console.log(result); // true or false
