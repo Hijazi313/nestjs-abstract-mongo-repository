@@ -29,15 +29,15 @@ export abstract class EntityRepository<T extends Document> {
    * Constructor for the EntityRepository class.
    * @param options - Configuration options for the repository.
    * @param options.entityModel - Mongoose model representing the entity.
-   * @param options.logger - Whether to enable logging (default is false).
+   * @param options.errLogger - Whether to enable error logging (default is false).
    * @throws Error if entityModel is not provided.
    */
   constructor(
     protected readonly options: Partial<{
       entityModel: Model<T>;
-      logger?: boolean;
+      errLogger?: boolean;
     }> = {
-      logger: false,
+      errLogger: false,
     }
   ) {
     if (!options.entityModel) {
@@ -46,12 +46,11 @@ export abstract class EntityRepository<T extends Document> {
   }
 
   /**
-   * Creates a new document.
-   * @param createEntity - Data for creating the new document.
+   * Creates a new document in the database using the provided data.
+   * @param createEntity - The data for creating the new document.
    * @returns Promise resolving to the created document.
    * @throws HttpException with appropriate status code if creation fails.
    */
-
   async create(createEntity: unknown) {
     try {
       return await new this.options.entityModel(createEntity).save();
@@ -416,7 +415,7 @@ export abstract class EntityRepository<T extends Document> {
   }
 
   private handleDatabaseError(error: any): void {
-    if (this.options.logger) {
+    if (this.options.errLogger) {
       this.logger.error(
         `Database Error: ${error?.name} -  ${error.message || error}`
       );

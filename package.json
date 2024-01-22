@@ -1,6 +1,6 @@
 {
   "name": "nestjs-abstract-mongo-repository",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "An abstract MongoDB entity repository for NestJS using Mongoose",
   "engines": {
     "node": ">=16.17.0",
@@ -26,7 +26,10 @@
   "author": "Muhammad Hamza Asif",
   "license": "ISC",
   "homepage": "https://github.com/Hijazi313/nestjs-abstract-mongo-repository",
-  "private": true,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@nestjs/common": "^10.0.0",
     "mongoose": "^8.0.3"
