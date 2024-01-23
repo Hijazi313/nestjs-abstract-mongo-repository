@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Logger } from "@nestjs/common";
 import {
   ClientSession,
+  CreateOptions,
   Document,
   FilterQuery,
   Model,
@@ -51,9 +52,9 @@ export abstract class EntityRepository<T extends Document> {
    * @returns Promise resolving to the created document.
    * @throws HttpException with appropriate status code if creation fails.
    */
-  async create(createEntity: unknown) {
+  async create(createEntity: unknown, options?: CreateOptions) {
     try {
-      return await new this.options.entityModel(createEntity).save();
+      return await new this.options.entityModel(createEntity).save(options);
     } catch (err) {
       this.handleDatabaseError(err);
     }
