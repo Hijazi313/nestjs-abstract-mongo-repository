@@ -1,6 +1,6 @@
 {
   "name": "nestjs-abstract-mongo-repository",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "An abstract MongoDB entity repository for NestJS using Mongoose",
   "engines": {
     "node": ">=16.17.0",

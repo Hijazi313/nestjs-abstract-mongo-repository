@@ -233,21 +233,30 @@ export abstract class EntityRepository<T extends Document> {
   }
 
   /**
-   * Finds a document by the provided filter query, updates it, and returns the updated document.
-   * @param filterQuery - Filter criteria for finding the document to update.
-   * @param updatedObject - Data to update the document with.
-   * @returns Promise resolving to the updated document or null.
-   * @throws HttpException with appropriate status code if update fails.
+   * Asynchronously finds a document based on the provided filter query and updates it.
+   * If no document matches the filter query, it may create a new document based on the upsert option.
+   *
+   * @param filterQuery - The query object used to filter the document to be updated.
+   * @param updatedObject - An object representing the updates to be applied to the document.
+   * @param options - Optional configuration for the update operation. Defaults to { versionKey: "__v", incVersion: false, upsert: false }.
+   *   - versionKey: The key used for versioning (default: "__v").
+   *   - incVersion: Whether to increment the version key (default: false).
+   *   - upsert: Whether to create a new document if no match is found (default: false).
+   *
+   * @returns A Promise resolving to the updated document or null if no document is found.
    */
   async findOneAndUpdate(
     filterQuery: FilterQuery<T>,
-    updatedObject: UpdateQuery<unknown>
+    updatedObject: UpdateQuery<unknown>,
+    options = { versionKey: "__v", incVersion: false, upsert: false }
   ): Promise<T | null> {
     try {
       return await this.options.entityModel.findOneAndUpdate(
         filterQuery,
-        updatedObject,
-        { new: true }
+        options.incVersion
+          ? { ...updatedObject, $inc: { [options.versionKey]: 1 } }
+          : updatedObject,
+        { new: true, upsert: options.upsert }
       );
     } catch (err) {
       this.handleDatabaseError(err);
